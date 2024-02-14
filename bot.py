@@ -15,7 +15,7 @@ START, LOCATION, ORDER, CONTACT = range(4)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("Hi! I'm Fastfood delivery bot, I will help you", reply_markup=ReplyKeyboardMarkup(
+    await update.message.reply_text("Hi!", reply_markup=ReplyKeyboardMarkup(
         [["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]],
         resize_keyboard=True
     ))
