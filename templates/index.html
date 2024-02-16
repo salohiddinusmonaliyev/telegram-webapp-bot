@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+	<meta charset="utf-8">
+	<title>ZED Delivery Bot</title>
+	<meta name="viewport"
+	      content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"/>
+	<meta name="format-detection" content="telephone=no"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="MobileOptimized" content="176"/>
+	<meta name="HandheldFriendly" content="True"/>
+	<meta name="robots" content="noindex, nofollow"/>
+	<script src="https://tg.dev/js/telegram-web-app.js?7"></script>
+
+	<link href="{% static 'css/cafe.css' %}" rel="stylesheet">
+</head>
+<body style="background-color: white">
+<section class="cafe-page cafe-items">
+	{% for i in products %}
+	<div class="cafe-item js-item" data-item-id="1" data-item-price="4990">
+		<div class="cafe-item-counter js-item-counter">0</div>
+		<div class="cafe-item-photo">
+			<picture class="cafe-item-lottie js-item-lottie">
+				<source type="application/x-tgsticker" srcset="{% static '/img/tgs/Burger.tgs' %}">
+				<img src="{{ i.image.url }}"
+				     style="background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iLTMwMCUiIHgyPSItMjAwJSIgeTE9IjAiIHkyPSIwIj48c3RvcCBvZmZzZXQ9Ii0xMCUiIHN0b3Atb3BhY2l0eT0iLjEiLz48c3RvcCBvZmZzZXQ9IjMwJSIgc3RvcC1vcGFjaXR5PSIuMDciLz48c3RvcCBvZmZzZXQ9IjcwJSIgc3RvcC1vcGFjaXR5PSIuMDciLz48c3RvcCBvZmZzZXQ9IjExMCUiIHN0b3Atb3BhY2l0eT0iLjEiLz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJ4MSIgZnJvbT0iLTMwMCUiIHRvPSIxMjAwJSIgZHVyPSIzcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiLz48YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJ4MiIgZnJvbT0iLTIwMCUiIHRvPSIxMzAwJSIgZHVyPSIzcyIgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBmaWxsPSJ1cmwoI2cpIiBkPSJNMjY4LDQ5OWMtNTEtMi0xMDYtMS0xNTMtMjItMjgtMTItMzktNDAtNDItNjgsMC00LDMtNywxLTEwLTUtNi0xNiwzLTEzLTE0LDItMTEsMTItMTQsMTEtMjcsMC0yLTUtMTItNS0xNiwwLTYsNS0xNyw0LTIyLTItNy05LTUtNi0xNSwzLTEwLDE0LTcsMTktMTMsNy0xMi0xNC0yNC0xNy0zMy0zLTEyLTEtMjgsMi0zOSwyOC0xMDEsMTQ4LTEzMywyMzktMTE1LDY0LDEzLDEzMCw1OSwxNDIsMTI3LDMsMTgsMCwzMi0xNSw0Mi0xLDEtMTEsMTMtNywxNiw0LDIsMjAsNCwyMiw5LDYsMTAtNywxNS05LDIyLTEsMywzLDExLDMsMTYsMCwyLTMsMTctMiwxOSwyLDIsOCwxLDEwLDQsMyw1LDQsMTYsNiwyMiw0LDEzLTE1LDIwLTE5LDI3LTksMjAsNSw0MC0yMyw2MC00MCwyOC0xMDEsMjktMTQ4LDMweiIvPjwvc3ZnPg==');"
+				     alt="Burger">
+			</picture>
+		</div>
+		<div class="cafe-item-label">
+			<span class="cafe-item-title">{{ i.name }}</span>
+			<span class="cafe-item-price">{{ i.price }} so'm</span>
+		</div>
+		<div class="cafe-item-buttons">
+			<button class="cafe-item-decr-button js-item-decr-btn button-item ripple-handler">
+				<span class="ripple-mask"><span class="ripple"></span></span>
+			</button>
+			<button class="cafe-item-incr-button js-item-incr-btn button-item ripple-handler">
+				<span class="button-item-label">Add</span>
+				<span class="ripple-mask"><span class="ripple"></span></span>
+			</button>
+		</div>
+	</div>
+	{% endfor %}
+	<div class="cafe-item-shadow"></div>
+	<div class="cafe-item-shadow"></div>
+	<div class="cafe-item-shadow"></div>
+	<div class="cafe-item-shadow"></div>
+</section>
+<div id="picker"
+         style="display: flex; justify-content: center; align-items: center; height: 100%; width: 100%"></div>
+</div>
+<div class="cafe-status-wrap">
+	<div class="cafe-status js-status"></div>
+</div>
+<script src="https://tg.dev/js/jquery.min.js"></script>
+<script src="https://tg.dev/js/tgsticker.js?27"></script>
+<script src="{% static 'js/cafe.js' %}"></script>
+<script type="text/javascript">
+    Telegram.WebApp.ready();
+    Telegram.WebApp.MainButton.setText('Order').show().onClick(function () {
+        // Get the item quantity and price from the cafe app
+        const items = document.getElementsByClassName('js-item');
+        const order = [];
+
+        Array.from(items).forEach(function(item) {
+            const id = item.getAttribute('data-item-id');
+            const quantity = parseInt(item.querySelector('.js-item-counter').innerText);
+            const priceElement = item.querySelector('.cafe-item-price');
+            const price = parseFloat(priceElement.innerText.replace('$', ''));
+            const title = item.querySelector('.cafe-item-title').innerText;
+
+            order.push({id: id, quantity: quantity, price: price, title: title});
+        });
+
+        const data = JSON.stringify(order);
+        Telegram.WebApp.sendData(data);
+        Telegram.WebApp.close();
+    });
+</script>
+<script type="text/javascript">
+    Telegram.WebApp.expand();
+</script>
+<script>
+    Cafe.init({
+        "apiUrl": "<?php echo $_ENV['REMOTE_PATH'] . '/telegram' ?>",
+        "userId": 0,
+        "userHash": null
+    });
+</script>
+
+
+
+</body>
+</html>

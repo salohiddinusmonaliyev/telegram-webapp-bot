@@ -15,7 +15,7 @@ START, LOCATION, ORDER, CONTACT = range(4)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("Hi! I'm Fastfood delivery bot, I will help you", reply_markup=ReplyKeyboardMarkup(
+    await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(
         [["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]],
         resize_keyboard=True
     ))
@@ -33,6 +33,13 @@ async def begin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif update.message.text == "ℹ️ Biz haqimizda":
         await update.message.reply_text("Buyurtma berish uchun /start ni bosing", reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
+    elif update.message.text == "/start":
+        await update.message.reply_text("Salom",
+                                        reply_markup=ReplyKeyboardMarkup(
+                                            [["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]],
+                                            resize_keyboard=True
+                                        ))
+        return START
     else:
         await update.message.reply_text("Buyurtma berish uchun /start ni bosing", reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
@@ -103,13 +110,15 @@ async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                        f"<b>Yangi buyurtma 🚚</b>{user_data}\n\n<b>💰 Umumiy narx: {order_total_price} so'm</b>"
                                    ), parse_mode="HTML"
                                    )
+    await update.message.reply_text("Buyurtma qabul qilindi. Tez orada siz bilan bo'glanishadi.",
+                                    reply_markup=ReplyKeyboardRemove())
     await update.message.reply_text("Yangi buyurtma berish uchun /start ni bosing", reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("6264932721:AAFyfzUHWaY96_A9EvJ6hcM92fW_meVR72o").build()
+    application = Application.builder().token("6700413743:AAGr-HS-4WWRPcQFHjbh_xmkCQoy9qzFJWY").build()
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(

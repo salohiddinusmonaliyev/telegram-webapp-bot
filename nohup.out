@@ -1,0 +1,153 @@
+Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Manage App Execution Aliases.
+Python was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Manage App Execution Aliases.
+2024-02-15 17:24:17,079 - telegram.ext.Application - INFO - Application started
+Traceback (most recent call last):
+  File "C:\projects\fastfood-bot\bot.py", line 4, in <module>
+    from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\__init__.py", line 197, in <module>
+    from . import _version, constants, error, helpers, request, warnings
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\__init__.py", line 21, in <module>
+    from ._httpxrequest import HTTPXRequest
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\_httpxrequest.py", line 22, in <module>
+    import httpx
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\__init__.py", line 2, in <module>
+    from ._api import delete, get, head, options, patch, post, put, request, stream
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_api.py", line 4, in <module>
+    from ._client import Client
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_client.py", line 30, in <module>
+    from ._transports.default import AsyncHTTPTransport, HTTPTransport
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_transports\default.py", line 30, in <module>
+    import httpcore
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\__init__.py", line 1, in <module>
+    from ._api import request, stream
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_api.py", line 5, in <module>
+    from ._sync.connection_pool import ConnectionPool
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 991, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1087, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1186, in get_data
+KeyboardInterrupt
+2024-02-15 19:14:55,224 - telegram.ext.Application - INFO - Application started
+2024-02-15 19:46:58,372 - telegram.ext.Updater - ERROR - Error while getting Updates: httpx.ReadError: 
+2024-02-15 19:46:58,372 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_exceptions.py", line 10, in map_exceptions
+    yield
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_backends\anyio.py", line 34, in read
+    return await self._stream.receive(max_bytes=max_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\anyio\streams\tls.py", line 205, in receive
+    data = await self._call_sslobject_method(self._ssl_object.read, max_bytes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\anyio\streams\tls.py", line 147, in _call_sslobject_method
+    data = await self.transport_stream.receive()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\anyio\_backends\_asyncio.py", line 1132, in receive
+    raise self._protocol.exception from None
+anyio.BrokenResourceError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_transports\default.py", line 66, in map_httpcore_exceptions
+    yield
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_transports\default.py", line 366, in handle_async_request
+    resp = await self._pool.handle_async_request(req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_async\connection_pool.py", line 268, in handle_async_request
+    raise exc
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_async\connection_pool.py", line 251, in handle_async_request
+    response = await connection.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_async\connection.py", line 103, in handle_async_request
+    return await self._connection.handle_async_request(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_async\http11.py", line 133, in handle_async_request
+    raise exc
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_async\http11.py", line 111, in handle_async_request
+    ) = await self._receive_response_headers(**kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_async\http11.py", line 176, in _receive_response_headers
+    event = await self._receive_event(timeout=timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_async\http11.py", line 212, in _receive_event
+    data = await self._network_stream.read(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_backends\anyio.py", line 31, in read
+    with map_exceptions(exc_map):
+  File "C:\Users\Salohiddin\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpcore\_exceptions.py", line 14, in map_exceptions
+    raise to_exc(exc) from exc
+httpcore.ReadError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\_httpxrequest.py", line 268, in do_request
+    res = await self._client.request(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_client.py", line 1530, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_client.py", line 1617, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_client.py", line 1645, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_client.py", line 1682, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_client.py", line 1719, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_transports\default.py", line 365, in handle_async_request
+    with map_httpcore_exceptions():
+  File "C:\Users\Salohiddin\AppData\Local\Programs\Python\Python312\Lib\contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\httpx\_transports\default.py", line 83, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.ReadError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\ext\_updater.py", line 688, in _network_loop_retry
+    if not await action_cb():
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\ext\_updater.py", line 384, in polling_action_cb
+    raise exc
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\ext\_updater.py", line 373, in polling_action_cb
+    updates = await self.bot.get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\ext\_extbot.py", line 558, in get_updates
+    updates = await super().get_updates(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\_bot.py", line 525, in decorator
+    result = await func(self, *args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\_bot.py", line 3584, in get_updates
+    await self._post(
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\_bot.py", line 613, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\ext\_extbot.py", line 340, in _do_post
+    return await super()._do_post(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\_bot.py", line 641, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\_baserequest.py", line 200, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\_baserequest.py", line 340, in _request_wrapper
+    raise exc
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\_baserequest.py", line 330, in _request_wrapper
+    code, payload = await self.do_request(
+                    ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\_httpxrequest.py", line 292, in do_request
+    raise NetworkError(f"httpx.{err.__class__.__name__}: {err}") from err
+telegram.error.NetworkError: httpx.ReadError: 
