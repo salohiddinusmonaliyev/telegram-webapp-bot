@@ -151,3 +151,4 @@ Traceback (most recent call last):
   File "C:\Users\Salohiddin\.virtualenvs\fastfood-bot-KYIN7ojc\Lib\site-packages\telegram\request\_httpxrequest.py", line 292, in do_request
     raise NetworkError(f"httpx.{err.__class__.__name__}: {err}") from err
 telegram.error.NetworkError: httpx.ReadError: 
+2024-02-19 03:50:09,530 - telegram.ext.Application - INFO - Application started

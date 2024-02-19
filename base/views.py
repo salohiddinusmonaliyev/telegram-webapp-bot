@@ -28,7 +28,7 @@ class OrderViewSet(APIView):
             return Response(ser.data, status=status.HTTP_200_OK)
 
 
-def home(request, s):
+def home(request):
     data = {
         "products": Product.objects.all()
     }
