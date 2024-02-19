@@ -8,7 +8,8 @@ This Telegram bot enables users to quickly and easily order fast food. Users can
 
 ## Screenshots
 
-![image](https://github.com/salohiddinusmonaliyev/bombaburger-bot/assets/108422142/ada27eed-74ba-43d9-b849-cbde91078bfa)
+![image](https://github.com/salohiddinusmonaliyev/bombaburger-bot/assets/108422142/e67a846c-9e7a-449d-a217-b1511e48a578)
+
 
 
 
