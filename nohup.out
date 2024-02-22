@@ -152,3 +152,9 @@ Traceback (most recent call last):
     raise NetworkError(f"httpx.{err.__class__.__name__}: {err}") from err
 telegram.error.NetworkError: httpx.ReadError: 
 2024-02-19 03:50:09,530 - telegram.ext.Application - INFO - Application started
+2024-02-19 04:59:35,382 - telegram.ext.Application - INFO - Application started
+2024-02-19 07:08:12,802 - telegram.ext.Application - INFO - Application started
+2024-02-19 07:08:42,018 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2024-02-19 07:08:42,018 - telegram.ext.Application - INFO - Application.stop() complete
+[{'id': '1', 'quantity': 3, 'price': 15000, 'title': 'Buger'}, {'id': '1', 'quantity': 0, 'price': 25000, 'title': 'Taco'}, {'id': '1', 'quantity': 0, 'price': 80000, 'title': 'Pizza'}, {'id': '1', 'quantity': 3, 'price': 15000, 'title': 'HotDog'}, {'id': '1', 'quantity': 0, 'price': 23000, 'title': 'Fries'}, {'id': '1', 'quantity': 0, 'price': 25000, 'title': 'Burger'}, {'id': '1', 'quantity': 3, 'price': 7000, 'title': 'Pepsi'}, {'id': '1', 'quantity': 0, 'price': 22000, 'title': 'Taco'}, {'id': '1', 'quantity': 0, 'price': 90000, 'title': 'Pizza'}]
+2024-02-22 11:00:04,876 - telegram.ext.Application - INFO - Application started

@@ -59,7 +59,7 @@ async def get_location(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(
                 text="🛒 Buyurtmma berish",
-                web_app=WebAppInfo(url="https://zedpos.pythonanywhere.com/"),
+                web_app=WebAppInfo(url="https://zedproject.pythonanywhere.com/"),
             ), resize_keyboard=True, input_field_placeholder="Buyurtma bering"
         ),
     )
@@ -77,14 +77,14 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> ra
             totalprice = int(i["quantity"]) * float(i["price"])
             total_price += totalprice
             totalprice = "{:,.0f}".format(totalprice).replace(",", " ")
-            text = (f"{text}\n\n👉 Mahsulot kodi: {i['id']}\nMahsulot nomi: {i['title']}\nMiqdori: {i['quantity']} dona"
+            text = (f"{text}\n\n👉 Mahsulot nomi: {i['title']}\nMiqdori: {i['quantity']} dona"
                     f"\nBir dona mahsulot narxi: {i['price']} so'm\nUmumiy narx: {totalprice} so'm")
 
     total_price = "{:,.0f}".format(total_price).replace(",", " ")
 
     await update.message.reply_text(f"{text}\n\n<b>💰 Umumiy narx: {total_price} so'm</b>", parse_mode="HTML")
 
-    await update.message.reply_text("✅ Buyurtmalar qabul qilindi", reply_markup=ReplyKeyboardMarkup.from_button(
+    await update.message.reply_text("✅ Buyurtmalar qabul qilindi\nTelefon raqamingizni yuboring.", reply_markup=ReplyKeyboardMarkup.from_button(
         KeyboardButton(
             text="☎️ Telefon raqamni yuborish", request_contact=True
         ), resize_keyboard=True
@@ -118,7 +118,7 @@ async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token("6700413743:AAGr-HS-4WWRPcQFHjbh_xmkCQoy9qzFJWY").build()
+    application = Application.builder().token("6700413743:AAESqJRU27v2AVwUDzqh3utvrItxh1sX8NM").build()
 
     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
     conv_handler = ConversationHandler(
