@@ -28,12 +28,12 @@ from base.views import *
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'product', ProductViewSet)
+router.register(r'order', OrderViewSet)
+router.register(r'order-item', OrderItemViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home),
     path('api/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls')),
-    # path('add/<int:s>/', home),
-    path('add/', order_create),
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

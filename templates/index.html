@@ -18,14 +18,16 @@
 <body style="background-color: white">
 <section class="cafe-page cafe-items">
 	{% for i in products %}
-	<div class="cafe-item js-item" data-item-id="1" data-item-price="4990">
+	<div class="cafe-item js-item" data-item-id="{{i.id}}" data-item-price="4990">
 		<div class="cafe-item-counter js-item-counter">0</div>
 		<div class="cafe-item-photo">
 			<picture class="cafe-item-lottie js-item-lottie">
 				<source type="application/x-tgsticker" srcset="{% static '/img/tgs/Burger.tgs' %}">
+				{% if i.image %}
 				<img src="{{ i.image.url }}"
 				     style="border-radius: 8px"
 				     alt="Burger">
+				{% endif %}
 			</picture>
 		</div>
 		<div class="cafe-item-label">
