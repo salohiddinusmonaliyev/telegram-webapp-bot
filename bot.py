@@ -4,6 +4,10 @@ import logging
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
 
+import re
+
+pattern = r'\+998\d{9}\b'
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -84,12 +88,12 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> ra
 
     await update.message.reply_text(f"{text}\n\n<b>💰 Umumiy narx: {total_price} so'm</b>", parse_mode="HTML")
 
-    await update.message.reply_text("✅ Buyurtmalar qabul qilindi\nTelefon raqamingizni yuboring.", reply_markup=ReplyKeyboardMarkup.from_button(
+    await update.message.reply_text("✅ Buyurtmalar qabul qilindi\n\nTelefon raqamingizni joꞌnating. \n(<b>☎️ Telefon raqamni yuborish</b> tugmasini bosing Yoki raqamingizni quyidagi formatda kiriting (<b>+998xxxxxxxxx</b>)", parse_mode="HTML",reply_markup=ReplyKeyboardMarkup.from_button(
         KeyboardButton(
             text="☎️ Telefon raqamni yuborish", request_contact=True
         ), resize_keyboard=True
     ))
-
+    print(update.message.text)
     global order_items
     global order_total_price
     order_total_price = total_price
@@ -98,13 +102,19 @@ async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> ra
 
     return CONTACT
 
-
 async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global contact
-    contact = update.message.contact
-    await update.message.reply_text("✅ Telefon raqam qabul qilindi", reply_markup=ReplyKeyboardRemove())
-
-    user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact.phone_number}</b>\n<b>📍 Manzil: {user_location}</b>"
+    if update.message.contact:
+        contact = update.message.contact.phone_number
+    else:
+        contact = update.message.text
+        if re.match(pattern, contact):
+            await update.message.reply_text("✅ Telefon raqam qabul qilindi", reply_markup=ReplyKeyboardRemove())
+            contact = update.message.text
+        else:
+            await update.message.reply_text("❌ Iltimos, raqamingizni quyidagi formatda kiriting (<b>+998xxxxxxxxx</b>)", parse_mode="HTML")
+            return CONTACT
+    user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact}</b>\n<b>📍 Manzil: {user_location}</b>"
     await context.bot.send_message(chat_id=6513420947,
                                    text=(
                                        f"<b>Yangi buyurtma 🚚</b>{user_data}\n\n<b>💰 Umumiy narx: {order_total_price} so'm</b>"
@@ -112,7 +122,7 @@ async def get_contact(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                    )
     await update.message.reply_text("Buyurtma qabul qilindi. Tez orada siz bilan bo'glanishadi.",
                                     reply_markup=ReplyKeyboardRemove())
-    await update.message.reply_text("Yangi buyurtma berish uchun /start ni bosing", reply_markup=ReplyKeyboardRemove())
+    await update.message.reply_text("Yangi buyurtma berish uchun <b>/start</b> ni bosing", reply_markup=ReplyKeyboardRemove(), parse_mode="HTML")
     return ConversationHandler.END
 
 def main() -> None:
@@ -128,7 +138,8 @@ def main() -> None:
             LOCATION: [MessageHandler(filters.TEXT, get_location),
                        MessageHandler(filters.LOCATION, get_location)],
             ORDER: [MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data)],
-            CONTACT: [MessageHandler(filters.CONTACT, get_contact)],
+            CONTACT: [MessageHandler(filters.CONTACT, get_contact),
+                      MessageHandler(filters.TEXT, get_contact)],
         },
         fallbacks=[],
     )

@@ -1,101 +1,70 @@
-import json
-import logging
+'''
+  For more samples please visit https://github.com/Azure-Samples/cognitive-services-speech-sdk
+'''
+
+import azure.cognitiveservices.speech as speechsdk
 
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, ConversationHandler
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
-logging.getLogger("httpx").setLevel(logging.WARNING)
 
-logger = logging.getLogger(__name__)
+# Creates an instance of a speech config with specified subscription key and service region.
+speech_key = "5bab0ec1dc714f80a0e304a855ad398c"
+service_region = "eastus2"
 
+GET_TEXT, REPLY_AUDIO = range(2)
 
-LOCATION = range(1)
+async def hello(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "Buyurtma berish uchun pastdagi tugmani bosing.",
-        reply_markup=ReplyKeyboardMarkup.from_button(
-            KeyboardButton(
-                text="🛒 Buyurtmma berish",
-                web_app=WebAppInfo(url="https://zedpos.pythonanywhere.com/"),
-            ), resize_keyboard=True, input_field_placeholder="Buyurtma bering"
-        ),
-    )
+    return REPLY_AUDIO
 
+async def func1(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.text == "/start":
+      await update.message.reply_text("Matn yuboring")
+    else:
+      speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
+      # Note: the voice setting will not overwrite the voice element in input SSML.
+      speech_config.speech_synthesis_voice_name = "uz-UZ-SardorNeural"
+      text = f"{update.message.text}"
 
-async def web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    data = json.loads(update.effective_message.web_app_data.data)
-    text = ""
-    total_price = 0
+      # use the default speaker as audio output.
+      speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
 
-    for i in data:
-        if i["quantity"] != 0 and i['quantity'] is not None:
-            totalprice = int(i["quantity"]) * float(i["price"])
-            total_price += totalprice
-            totalprice = "{:,.0f}".format(totalprice).replace(",", " ")
-            text = (f"{text}\n\n👉 Mahsulot kodi: {i['id']}\nMahsulot nomi: {i['title']}\nMiqdori: {i['quantity']} dona"
-                    f"\nBir dona mahsulot narxi: {i['price']} so'm\nUmumiy narx: {totalprice} so'm")
-
-    total_price = "{:,.0f}".format(total_price).replace(",", " ")
-
-    await context.bot.send_message(chat_id=6513420947,
-                                   text=(
-                                       f"<b>Yangi buyurtma 🚚</b>{text}\n\n<b>💰 Umumiy narx: {total_price} so'm</b>"
-                                   ), parse_mode="HTML"
-                                   )
-
-    await update.message.reply_text(f"{text}\n\n<b>💰 Umumiy narx: {total_price} so'm</b>", parse_mode="HTML")
-    await update.message.reply_text("Joylashuvingizni yuboring", reply_markup=ReplyKeyboardMarkup.from_button(
-        KeyboardButton(
-            text="📍Joylashuvni yuborish", request_location=True
-        ), resize_keyboard=True,
-    ))
-
-    # return LOCATION
+      result = speech_synthesizer.speak_text_async(text).get()
+      # Check result
+      if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
+          print("Speech synthesized for text [{}]".format(text))
+      elif result.reason == speechsdk.ResultReason.Canceled:
+          cancellation_details = result.cancellation_details
+          print("Speech synthesis canceled: {}".format(cancellation_details.reason))
+          if cancellation_details.reason == speechsdk.CancellationReason.Error:
+              print("Error details: {}".format(cancellation_details.error_details))
 
 
-# async def get_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-#     location = update.message.location
-#     await update.message.reply_text("...")
-#
-#
-# async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-#     await update.message.reply_text(
-#         "Bye!", reply_markup=ReplyKeyboardRemove()
-#     )
-#
-#     return ConversationHandler.END
+      speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Riff24Khz16BitMonoPcm)
+      speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
-# def main() -> None:
-#     """Run the bot."""
-#     # Create the Application and pass it your bot's token.
-#     application = Application.builder().token("6982793504:AAEUCs6fcuyiD0HbmOkWtO5_SgzdG2ULnfM").build()
-#
-#     # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
-#     conv_handler = ConversationHandler(
-#         entry_points=[CommandHandler("start", start)],
-#         states={
-#             LOCATION: [
-#                 MessageHandler(filters.LOCATION, get_location),
-#             ],
-#         },
-#         fallbacks=[CommandHandler("cancel", cancel)],
-#     )
-#
-#     application.add_handler(conv_handler)
-#
-#     # Run the bot until the user presses Ctrl-C
-#     application.run_polling(allowed_updates=Update.ALL_TYPES)
+      stream = speechsdk.AudioDataStream(result)
+      stream.save_to_wav_file("file.wav")
+      await update.message.reply_voice(voice="file.wav")
+
 
 def main() -> None:
-    application = Application.builder().token("6982793504:AAEUCs6fcuyiD0HbmOkWtO5_SgzdG2ULnfM").build()
+    """Run the bot."""
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("6537176842:AAHA4C1Njv9-_u4by5fOStvw0wHOOjl2O0k").build()
 
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data))
-
+    # Add conversation handler with the states GENDER, PHOTO, LOCATION and BIO
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", hello)],
+        states={
+            REPLY_AUDIO: [MessageHandler(filters.TEXT, func1)],
+        },
+        fallbacks=[],
+    )
+    application.add_handler(conv_handler)
+    # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
