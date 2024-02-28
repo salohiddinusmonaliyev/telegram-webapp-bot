@@ -1,19 +1,27 @@
-import requests
+from datetime import datetime, timedelta
 import json
+import requests
 
-json_data = requests.get("https://special-space-adventure-rq799wpxw442xgxr-8000.app.github.dev/api/order/")
-json_data_order_item = requests.get("https://special-space-adventure-rq799wpxw442xgxr-8000.app.github.dev/api/order-item/")
+
+json_data = requests.get("https://zedproject.pythonanywhere.com/api/order/")
+json_data_order_item = requests.get("https://zedproject.pythonanywhere.com/api/order-item/")
 items = json_data_order_item.json()
-order = json_data.json()
-order_list = []
-for i in order:
-    item_list = []
-    for n in items:
-        if n["order_id"] == i["id"]:
-            item_list.append(n)
-            i["items"] = item_list
-            # print(order)
+data = json_data.json()
 
-for i in order:
-    if i["user"]=="+998905856779":
-        print(i)
+
+# Function to parse date string to datetime object
+def parse_date(date_str):
+    return datetime.strptime(date_str, "%Y-%m-%d")
+
+# Calculate the first day of the previous month
+today = datetime.today()
+first_day_of_current_month = today.replace(day=1)
+last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
+
+# Filter items for the last month
+last_month_items = [item for item in data if parse_date(item['time']) >= first_day_of_previous_month and parse_date(item['time']) <= last_day_of_previous_month]
+
+# Print the last month items
+data = json.dumps(last_month_items, indent=4)
+print(data)
