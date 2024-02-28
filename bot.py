@@ -50,7 +50,7 @@ async def begin(update: Update, context):
         await update.message.reply_text("Buyurtma berish uchun /start ni bosing", reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
     elif text == "📄 Buyurtmalar tarixini olish":
-        await update.message.reply_text("Iltimos, mijoz telefon raqamini kiriting:", reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text("Iltimos, mijoz telefon raqamini (+998CCXXXXXXX) kiriting:", reply_markup=ReplyKeyboardRemove())
         return PHONE_NUMBER
     elif text == "/start":
         return await start(update, context)
@@ -71,7 +71,7 @@ async def phone_number(update: Update, context):
             [["📆 O'tgan oy", "🗓 O'tgan yil"]], resize_keyboard=True))
         return HISTORY
     else:
-        await update.message.reply_html("❌ Iltimos, raqamni <b>+998XXXXXXXXX</b> formatida kiriting.")
+        await update.message.reply_html("❌ Iltimos, raqamni <b>+998CCXXXXXXX</b> formatida kiriting.")
         return PHONE_NUMBER
 
 
@@ -171,7 +171,7 @@ async def web_app_data(update: Update, context):
 
     await update.message.reply_text(f"{text}\n\n<b>💰 Umumiy narx: {total_price} so'm</b>", parse_mode="HTML")
     await update.message.reply_text(
-        "✅ Buyurtmalar qabul qilindi\n\nTelefon raqamingizni joꞌnating. \n(<b>☎️ Telefon raqamni yuborish</b> tugmasini bosing Yoki raqamingizni quyidagi formatda kiriting (<b>+998xxxxxxxxx</b>)",
+        "✅ Buyurtmalar qabul qilindi\n\nTelefon raqamingizni joꞌnating. \n(<b>☎️ Telefon raqamni yuborish</b> tugmasini bosing Yoki raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
         parse_mode="HTML",
         reply_markup=ReplyKeyboardMarkup.from_button(
             KeyboardButton(text="☎️ Telefon raqamni yuborish", request_contact=True),
@@ -195,7 +195,7 @@ async def get_contact(update: Update, context):
             await update.message.reply_text("✅ Telefon raqam qabul qilindi", reply_markup=ReplyKeyboardRemove())
             contact = update.message.text
         else:
-            await update.message.reply_text("❌ Iltimos, raqamingizni quyidagi formatda kiriting (<b>+998xxxxxxxxx</b>)",
+            await update.message.reply_text("❌ Iltimos, raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
                                             parse_mode="HTML")
             return CONTACT
 
@@ -235,7 +235,7 @@ async def get_contact(update: Update, context):
 
 
 def main():
-    application = Application.builder().token("6700413743:AAHKB0JgznrHa2W_Q8-QrvdPybpOivUsUGs").build()
+    application = Application.builder().token("7022978226:AAEVA6mF5wXP2Eyi9BDkU7AhwQav1Zkz8QY").build()
 
     conv_handler = ConversationHandler(
         entry_points=[
