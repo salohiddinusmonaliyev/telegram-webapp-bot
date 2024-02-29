@@ -235,7 +235,7 @@ async def get_contact(update: Update, context):
 
 
 def main():
-    application = Application.builder().token("7022978226:AAEVA6mF5wXP2Eyi9BDkU7AhwQav1Zkz8QY").build()
+    application = Application.builder().token("7022978226:AAF98060X177sO0VsOSfKklXLEfFC4r1n2I").build()
 
     conv_handler = ConversationHandler(
         entry_points=[
