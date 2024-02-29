@@ -66,7 +66,7 @@ async def begin(update: Update, context):
 
 
 async def phone_number(update: Update, context):
-    print(update.message.text)
+    # print(update.message.text)
     if re.match(pattern, update.message.text):
         user_data = context.user_data
         user_data["phone_number"] = update.message.text
@@ -79,7 +79,7 @@ async def phone_number(update: Update, context):
 
 
 async def history(update: Update, context):
-    print(update.message.text)
+    # print(update.message.text)
     if update.message.text == "📆 O'tgan oy" or update.message.text == "🗓 O'tgan yil":   
         message = await update.message.reply_text("Iltimos, biroz kuting")
 
@@ -184,6 +184,7 @@ async def web_app_data(update: Update, context):
                 piece_or_block = "blok"
             text = (f"{text}\n\n👉 Mahsulot nomi: {i['title']}\nMiqdori: {i['quantity']} <b>{piece_or_block}</b>"
                     f"\nBir dona mahsulot narxi: {i['price']} so'm\nUmumiy narx: {totalprice} so'm")
+
     total_price = "{:,.0f}".format(total_price).replace(",", " ")
 
     await update.message.reply_text(f"{text}\n\n<b>💰 Umumiy narx: {total_price} so'm</b>", parse_mode="HTML")
@@ -251,16 +252,22 @@ async def get_contact(update: Update, context):
     }
 
     order_response = requests.post(url="https://zedproject.pythonanywhere.com/api/order/", json=json_data)
-
+    
     for i in data:
-        order_item_data = {
-            "order_id": order_response.json()["id"],
-            "price": i["price"],
-            "quantity": i["quantity"],
-            "product": i["id"],
-        }
-        order_item_response = requests.post(url="https://zedproject.pythonanywhere.com/api/order-item/",
-                                            json=order_item_data)
+        if i["quantity"] != 0 and i['quantity'] is not None:
+            piece_or_block = None
+            if i["selectedOption"][:4] == "dona":
+                piece_or_block = "dona"
+            elif i["selectedOption"][:4] == "blok":
+                piece_or_block = "blok"
+            order_item_data = {
+                "order_id": order_response.json()["id"],
+                "price": i["price"],
+                "quantity": f"{i["quantity"]} {piece_or_block}",
+                "product": i["id"],
+            }
+            order_item_response = requests.post(url="https://zedproject.pythonanywhere.com/api/order-item/",
+                                                json=order_item_data)
     
     await update.message.reply_text("Buyurtma qabul qilindi. Tez orada siz bilan bo'glanishadi.",
                                     reply_markup=ReplyKeyboardRemove())
@@ -272,7 +279,7 @@ async def get_contact(update: Update, context):
 
 def main():
 
-    application = Application.builder().token("6537176842:AAF-VOqQcRBpFjLxZ-gydt46hYWW2Ag1wTM").build()
+    application = Application.builder().token("7022978226:AAFXcW_I3l3Fr-xlA-ewYSMWaEyCPrC2LKQ").build()
 
     conv_handler = ConversationHandler(
         entry_points=[
