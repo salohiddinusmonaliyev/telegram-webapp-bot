@@ -3,7 +3,7 @@ import logging
 import re
 import requests
 from datetime import date, datetime, timedelta
-from dateutil.relativedelta import relativedelta
+# from dateutil.relativedelta import relativedelta
 import pandas as pd
 import calendar
 
@@ -22,9 +22,10 @@ START, LOCATION, ORDER, CONTACT, PHONE_NUMBER, HISTORY = range(6)
 
 async def start(update: Update, context):
     user_id = str(update.effective_user.id)
-    buttons = [["📄 Buyurtmalar tarixini olish"], ["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
+    buttons = [["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
+    admin_buttons = [["📄 Buyurtmalar tarixini olish"], ["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
     if user_id == ADMIN:
-        await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
+        await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(admin_buttons, resize_keyboard=True))
     else:
         await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
     return START
@@ -59,11 +60,13 @@ async def begin(update: Update, context):
     elif text == "/contact_us":
         return await contact_us(update, context)
     else:
-        await update.message.reply_text("Buyurtma berish uchun /start ni bosing", reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text("🚫🚫🚫")
+        return await start(update, context)
         return ConversationHandler.END
 
 
 async def phone_number(update: Update, context):
+    print(update.message.text)
     if re.match(pattern, update.message.text):
         user_data = context.user_data
         user_data["phone_number"] = update.message.text
@@ -76,66 +79,74 @@ async def phone_number(update: Update, context):
 
 
 async def history(update: Update, context):
-    phone_number = context.user_data['phone_number']
-    json_data = requests.get("https://zedproject.pythonanywhere.com/api/order/")
-    json_data_order_item = requests.get("https://zedproject.pythonanywhere.com/api/order-item/")
-    items = json_data_order_item.json()
-    orders = json_data.json()
-    order_list = []
-    for order in orders:
-        item_list = [item for item in items if item["order_id"] == order["id"] and order["user"] == phone_number]
-        if item_list:
-            order["items"] = item_list
-            order_list.append(order)
+    print(update.message.text)
+    if update.message.text == "📆 O'tgan oy" or update.message.text == "🗓 O'tgan yil":   
+        message = await update.message.reply_text("Iltimos, biroz kuting")
 
-    def parse_date(date_str):
-        return datetime.strptime(date_str, "%Y-%m-%d")
+        phone_number = context.user_data['phone_number']
+        json_data = requests.get("https://zedproject.pythonanywhere.com/api/order/")
+        json_data_order_item = requests.get("https://zedproject.pythonanywhere.com/api/order-item/")
+        items = json_data_order_item.json()
+        orders = json_data.json()
+        order_list = []
+        for order in orders:
+            item_list = [item for item in items if item["order_id"] == order["id"] and order["user"] == phone_number]
+            if item_list:
+                order["items"] = item_list
+                order_list.append(order)
 
-    today = datetime.today()
-    # today = today.date()
-    # print(today.date())
-    if update.message.text == "📆 O'tgan oy":
-        first_day_of_current_month = today.replace(day=1)
-        last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
-        first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
-        time1, time2 = first_day_of_previous_month.date(), last_day_of_previous_month.date()
-        items = [item for item in order_list if parse_date(item['time']) >= first_day_of_previous_month and
-                 parse_date(item['time']) <= last_day_of_previous_month]
-    elif update.message.text == "🗓 O'tgan yil":
-        start_last_year = datetime(today.year - 1, 1, 1)
-        end_last_year = start_last_year.replace(year=today.year - 1, month=12, day=31)
-        start_last_year_str, end_last_year_str = start_last_year.strftime('%Y-%m-%d'), end_last_year.strftime('%Y-%m-%d')
-        time1, time2 = start_last_year_str, end_last_year_str
-        items = [item for item in order_list if item["time"] >= start_last_year_str and item["time"] <= end_last_year_str]
+        def parse_date(date_str):
+            return datetime.strptime(date_str, "%Y-%m-%d")
 
-    items_data = []
-    for order in items:
-        order_date = order["time"]
-        for item in order['items']:
-            product_response = requests.get("https://zedproject.pythonanywhere.com/api/product/")
-            product_json = product_response.json()
-            product = next((p["name"] for p in product_json if p["id"] == item["product"]), None)
+        today = datetime.today()
+        # today = today.date()
+        # print(today.date())
+        if update.message.text == "📆 O'tgan oy":
+            first_day_of_current_month = today.replace(day=1)
+            last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+            first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
+            time1, time2 = first_day_of_previous_month.date(), last_day_of_previous_month.date()
+            items = [item for item in order_list if parse_date(item['time']) >= first_day_of_previous_month and
+                    parse_date(item['time']) <= last_day_of_previous_month]
+        elif update.message.text == "🗓 O'tgan yil":
+            start_last_year = datetime(today.year - 1, 1, 1)
+            end_last_year = start_last_year.replace(year=today.year - 1, month=12, day=31)
+            start_last_year_str, end_last_year_str = start_last_year.strftime('%Y-%m-%d'), end_last_year.strftime('%Y-%m-%d')
+            time1, time2 = start_last_year_str, end_last_year_str
+            items = [item for item in order_list if item["time"] >= start_last_year_str and item["time"] <= end_last_year_str]
 
-            item['Buyurtma raqami'] = item.pop("order_id")
-            del item["id"]
-            item["Mahsulot"] = product
-            del item["product"]
-            item["Narxi"] = item.pop("price")
-            item["Miqdori"] = item.pop("quantity")
-            item["Sana"] = order_date
-            items_data.append(item)
+        items_data = []
+        for order in items:
+            order_date = order["time"]
+            for item in order['items']:
+                product_response = requests.get("https://zedproject.pythonanywhere.com/api/product/")
+                product_json = product_response.json()
+                product = next((p["name"] for p in product_json if p["id"] == item["product"]), None)
 
-    df = pd.DataFrame(items_data)
-    file_name = f"{phone_number} - {update.message.text}"
-    excel_filename = f'history/{file_name}.xlsx'
-    df.to_excel(excel_filename, index=False)
+                item['Buyurtma raqami'] = item.pop("order_id")
+                del item["id"]
+                item["Mahsulot"] = product
+                del item["product"]
+                item["Narxi"] = item.pop("price")
+                item["Miqdori"] = item.pop("quantity")
+                item["Sana"] = order_date
+                items_data.append(item)
 
-    await update.message.reply_document(document=f"history/{file_name}.xlsx",
-                                        caption=f"<b>📄 Buyurtmalar tarixi</b>\n\n👤 Foydalanuvchi: {phone_number}\n<b>🗓 {time1} - {time2}</b>",
-                                        parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
-    await update.message.reply_text("Botni qayta ishga tushirish uchun /start ni bosing.")
-    return ConversationHandler.END
-
+        df = pd.DataFrame(items_data)
+        file_name = f"{phone_number} - {update.message.text}"
+        excel_filename = f'history/{file_name}.xlsx'
+        df.to_excel(excel_filename, index=False)
+        await context.bot.deleteMessage(chat_id=update.message.chat_id,
+                                    message_id=message.id)
+        await update.message.reply_document(document=f"history/{file_name}.xlsx",
+                                            caption=f"<b>📄 Buyurtmalar tarixi</b>\n\n👤 Foydalanuvchi: {phone_number}\n<b>🗓 {time1} - {time2}</b>",
+                                            parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
+        await update.message.reply_text("Botni qayta ishga tushirish uchun /start ni bosing.")
+        return ConversationHandler.END
+    else:
+        await update.message.reply_text("Xatolik")
+        await update.message.reply_text("/start ni bosib botni qayta ishga tushiring")
+        return ConversationHandler.END
 
 async def get_location(update: Update, context):
     global user_location
@@ -235,7 +246,11 @@ async def get_contact(update: Update, context):
 
 
 def main():
+<<<<<<< HEAD
     application = Application.builder().token("7022978226:AAEHq0JHlHaTr_AQj6BQGdjAdbxowbg7XWc").build()
+=======
+    application = Application.builder().token("6537176842:AAF-VOqQcRBpFjLxZ-gydt46hYWW2Ag1wTM").build()
+>>>>>>> bbf6d56 (v2.2)
 
     conv_handler = ConversationHandler(
         entry_points=[

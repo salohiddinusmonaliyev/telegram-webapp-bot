@@ -3,7 +3,7 @@
 {% load static %}
 <head>
 	<meta charset="utf-8">
-	<title>ZED Delivery Bot</title>
+	<title>ZED</title>
 	<meta name="viewport"
 	      content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, viewport-fit=cover"/>
 	<meta name="format-detection" content="telephone=no"/>
@@ -15,21 +15,48 @@
 
 	<link href="{% static 'css/cafe.css' %}" rel="stylesheet">
 </head>
-<body style="background-color: white">
-<section class="cafe-page cafe-items">
+<body style="background-color: #f5f3f3">
+
+    <style>
+        input {
+  appearance: none;
+
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+
+  border: 2px solid #999;
+  transition: 0.2s all linear;
+  margin-right: 5px;
+
+  position: relative;
+  top: 4px;
+}
+
+input:checked {
+  border: 4px solid var(--main-color);
+}
+    </style>
+<section class="cafe-page cafe-items"  >
 	{% for i in products %}
-	<div class="cafe-item js-item" data-item-id="{{i.id}}" data-item-price="4990">
+	<div class="cafe-item js-item" data-item-id="{{i.id}}" data-item-price="0" style="background-color: white; border-radius: 5px; height: 205px;">
 		<div class="cafe-item-counter js-item-counter">0</div>
 		<div class="cafe-item-photo">
+
 			<picture class="cafe-item-lottie js-item-lottie">
+
 				<source type="application/x-tgsticker" srcset="{% static '/img/tgs/Burger.tgs' %}">
 				{% if i.image %}
 				<img src="{{ i.image.url }}"
 				     style="border-radius: 8px"
 				     alt="Burger">
 				{% endif %}
-			</picture>
+			</picture><hr>
 		</div>
+		<label for="input1{{i.id}}">Blok</label>
+			    <input style="color: var(--main-color)" name="type{{i.id}}" id="input1{{i.id}}" type="radio"><br>
+	    <label for="input{{i.id}}">Dona</label>
+			    <input style="color: var(--main-color)" name="type{{i.id}}" id="input{{i.id}}" type="radio"><hr>
 		<div class="cafe-item-label">
 			<span class="cafe-item-title">{{ i.name }}</span>
 			<span class="cafe-item-price">{{ i.price }} so'm</span>
@@ -61,7 +88,7 @@
 <script src="{% static 'js/cafe.js' %}"></script>
 <script type="text/javascript">
     Telegram.WebApp.ready();
-    Telegram.WebApp.MainButton.setText('Order').show().onClick(function () {
+    Telegram.WebApp.MainButton.setText('Buyurtma berish').show().onClick(function () {
         // Get the item quantity and price from the cafe app
         const items = document.getElementsByClassName('js-item');
         const order = [];

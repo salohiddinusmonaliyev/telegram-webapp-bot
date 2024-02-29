@@ -34,10 +34,15 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    BLOCK = (
+        ("Dona", "Dona"),
+        ("Blok", "Blok")
+    )
     order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     price = models.IntegerField(null=True)
     quantity = models.FloatField()
+    block = models.CharField(max_length=250, choices=BLOCK, null=True)
 
     def __str__(self):
         return self.product.name
