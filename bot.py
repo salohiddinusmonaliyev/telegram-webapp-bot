@@ -10,6 +10,15 @@ import calendar
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler
 
+
+from geopy.geocoders import Nominatim
+
+def get_location_name(latitude, longitude):
+    geolocator = Nominatim(user_agent="location_finder")
+    location = geolocator.reverse((latitude, longitude), language='en')
+    return location.address
+
+
 pattern = r'\+998\d{9}\b'
 
 
@@ -25,7 +34,7 @@ async def start(update: Update, context):
     buttons = [["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
     admin_buttons = [["📄 Buyurtmalar tarixini olish"], ["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
     if user_id == ADMIN:
-        await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(admin_buttons, resize_keyboard=True))
+        await update.message.reply_text(f"Salom {context.bot.username}", reply_markup=ReplyKeyboardMarkup(admin_buttons, resize_keyboard=True))
     else:
         await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
     return START
@@ -207,7 +216,7 @@ async def check(update: Update, context):
     if update.message.text == "✅ Ha":
         await update.message.reply_html("✅ Buyurtma tasdiqlandi")
         await update.message.reply_text(
-            "✅ Buyurtmalar qabul qilindi\n\nTelefon raqamingizni joꞌnating. \n(<b>☎️ Telefon raqamni yuborish</b> tugmasini bosing Yoki raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
+            "✅ Buyurtmalar qabul qilindi\n\nTelefon raqamingizni yuboring. \n(<b>☎️ Telefon raqamni yuborish</b> tugmasini bosing Yoki raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
             parse_mode="HTML",
             reply_markup=ReplyKeyboardMarkup.from_button(
                 KeyboardButton(text="☎️ Telefon raqamni yuborish", request_contact=True),
@@ -236,7 +245,14 @@ async def get_contact(update: Update, context):
             return CONTACT
     message = await update.message.reply_text("Iltimos, biroz kuting")
     await context.bot.deleteMessage(chat_id=update.message.chat_id, message_id=message.id)
-    user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact}</b>\n<b>📍 Manzil: {user_location}</b>"
+    # print(user_location)
+    try:
+        location = await context.bot.send_location(chat_id=ADMIN, latitude=user_location.latitude, longitude=user_location.longitude)
+        g_map = f"https://www.google.com/maps/@{user_location.latitude},{user_location.longitude},315m/data=!3m1!1e3?hl=en-US&entry=ttu"
+        user_location_msg = f"<a href='{g_map}'>{get_location_name(latitude=user_location.latitude, longitude=user_location.longitude)}</a>"
+    except AttributeError:
+        user_location_msg = user_location
+    user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact}</b>\n<b>📍 Manzil: {user_location_msg}</b>"
 
     await context.bot.send_message(chat_id=ADMIN,
                                    text=(
@@ -279,7 +295,7 @@ async def get_contact(update: Update, context):
 
 def main():
 
-    application = Application.builder().token("7022978226:AAFXcW_I3l3Fr-xlA-ewYSMWaEyCPrC2LKQ").build()
+    application = Application.builder().token("7022978226:AAEjbG7oXVf4kdXx2Mq9JU5_Js4Ytwh-tDo").build()
 
     conv_handler = ConversationHandler(
         entry_points=[

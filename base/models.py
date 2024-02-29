@@ -16,6 +16,7 @@ class Product(models.Model):
     code = models.IntegerField()
     name = models.CharField(max_length=250)
     price = models.IntegerField()
+    block_price = models.IntegerField(null=True)
     description = models.TextField()
     image = models.FileField(upload_to='products/', null=True, blank=True)
 

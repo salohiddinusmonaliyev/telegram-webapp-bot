@@ -5,3 +5,4 @@ requests
 pandas
 python-dateutil
 openpyxl
+geopy

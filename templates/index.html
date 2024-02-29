@@ -53,13 +53,16 @@ input:checked {
 				{% endif %}
 			</picture><hr>
 		</div>
-		<label for="input1{{i.id}}">Blok</label>
-			    <input style="color: var(--main-color)" name="type{{i.id}}" id="blok{{i.id}}" type="radio" checked><br>
-	    <label for="input{{i.id}}">Dona</label>
-			    <input style="color: var(--main-color)" name="type{{i.id}}" id="dona{{i.id}}" type="radio"><hr>
+		<label for="blok{{i.id}}">Blok</label>
+    <input style="color: var(--main-color)" name="type{{i.id}}" id="blok{{i.id}}" type="radio" checked data-block-price="{{ i.block_price }}">
+    <br>
+    <label for="dona{{i.id}}">Dona</label>
+    <input style="color: var(--main-color)" name="type{{i.id}}" id="dona{{i.id}}" type="radio" data-dona-price="{{ i.price }}">
+
+<hr>
 		<div class="cafe-item-label">
 			<span class="cafe-item-title">{{ i.name }}</span>
-			<span class="cafe-item-price">{{ i.price }} so'm</span>
+			    <span class="cafe-item-price" data-block-price="{{ i.block_price }}" data-dona-price="{{ i.price }}">{{ i.price }} so'm</span>
 		</div>
 		<div class="cafe-item-buttons">
 			<button class="cafe-item-decr-button js-item-decr-btn button-item ripple-handler">
@@ -134,6 +137,48 @@ Telegram.WebApp.close();
         "apiUrl": "<?php echo $_ENV['REMOTE_PATH'] . '/telegram' ?>",
         "userId": 0,
         "userHash": null
+    });
+</script>
+
+
+<script type="text/javascript">
+    // Function to update price based on selected option
+    function updatePrice(item) {
+        const priceElement = item.querySelector('.cafe-item-price');
+        const blockPrice = parseFloat(priceElement.dataset.blockPrice);
+        const donaPrice = parseFloat(priceElement.dataset.donaPrice);
+        const radioButtons = item.querySelectorAll('input[type="radio"]');
+        let selectedPrice;
+
+        // Loop through radio buttons to find selected option
+        radioButtons.forEach(function(radioButton) {
+            if (radioButton.checked) {
+                // Update price based on selected option
+                if (radioButton.id.includes('blok')) {
+                    selectedPrice = blockPrice;
+                } else if (radioButton.id.includes('dona')) {
+                    selectedPrice = donaPrice;
+                }
+            }
+        });
+
+        // Update displayed price
+        priceElement.innerText = selectedPrice + " so'm";
+    }
+
+    // Event listener for radio button changes
+    document.addEventListener('change', function(event) {
+        const target = event.target;
+        if (target.matches('input[type="radio"]')) {
+            const item = target.closest('.cafe-item');
+            updatePrice(item);
+        }
+    });
+
+    // Update prices on initial load
+    const items = document.querySelectorAll('.cafe-item');
+    items.forEach(function(item) {
+        updatePrice(item);
     });
 </script>
 
