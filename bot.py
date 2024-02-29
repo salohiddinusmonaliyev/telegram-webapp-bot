@@ -17,7 +17,7 @@ ADMIN = "6513420947"
 # logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 # logger = logging.getLogger(__name__)
 
-START, LOCATION, ORDER, CONTACT, PHONE_NUMBER, HISTORY = range(6)
+START, LOCATION, ORDER, CONTACT, PHONE_NUMBER, HISTORY, CHECK = range(7)
 
 
 async def start(update: Update, context):
@@ -171,21 +171,28 @@ async def web_app_data(update: Update, context):
     data = json.loads(update.effective_message.web_app_data.data)
     text = ""
     total_price = 0
+    # print(data)
     for i in data:
         if i["quantity"] != 0 and i['quantity'] is not None:
             totalprice = int(i["quantity"]) * float(i["price"])
             total_price += totalprice
             totalprice = "{:,.0f}".format(totalprice).replace(",", " ")
-            text = (f"{text}\n\n👉 Mahsulot nomi: {i['title']}\nMiqdori: {i['quantity']} dona"
+            piece_or_block = None
+            if i["selectedOption"][:4] == "dona":
+                piece_or_block = "dona"
+            elif i["selectedOption"][:4] == "blok":
+                piece_or_block = "blok"
+            text = (f"{text}\n\n👉 Mahsulot nomi: {i['title']}\nMiqdori: {i['quantity']} <b>{piece_or_block}</b>"
                     f"\nBir dona mahsulot narxi: {i['price']} so'm\nUmumiy narx: {totalprice} so'm")
     total_price = "{:,.0f}".format(total_price).replace(",", " ")
 
     await update.message.reply_text(f"{text}\n\n<b>💰 Umumiy narx: {total_price} so'm</b>", parse_mode="HTML")
+    yes_no = [["✅ Ha", "❌ Yo'q"]]
     await update.message.reply_text(
-        "✅ Buyurtmalar qabul qilindi\n\nTelefon raqamingizni joꞌnating. \n(<b>☎️ Telefon raqamni yuborish</b> tugmasini bosing Yoki raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
+        "✅ Buyurtmalar qabul qilindi\n\n<b>Buyurtmani tasdiqlaysizmi?</b>",
         parse_mode="HTML",
-        reply_markup=ReplyKeyboardMarkup.from_button(
-            KeyboardButton(text="☎️ Telefon raqamni yuborish", request_contact=True),
+        reply_markup=ReplyKeyboardMarkup(
+            yes_no,
             resize_keyboard=True
         )
     )
@@ -193,11 +200,28 @@ async def web_app_data(update: Update, context):
     global order_total_price
     order_total_price = total_price
     order_items = text
-    return CONTACT
+    return CHECK
 
+async def check(update: Update, context):
+    if update.message.text == "✅ Ha":
+        await update.message.reply_html("✅ Buyurtma tasdiqlandi")
+        await update.message.reply_text(
+            "✅ Buyurtmalar qabul qilindi\n\nTelefon raqamingizni joꞌnating. \n(<b>☎️ Telefon raqamni yuborish</b> tugmasini bosing Yoki raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
+            parse_mode="HTML",
+            reply_markup=ReplyKeyboardMarkup.from_button(
+                KeyboardButton(text="☎️ Telefon raqamni yuborish", request_contact=True),
+                resize_keyboard=True
+            )
+        )
+        return CONTACT
+    elif update.message.text == "❌ Yo'q":
+        await update.message.reply_html("❌ Buyurtma rad etildi.")
+        await update.message.reply_text("Botni qayta ishga tushirish uchun /start ni bosing", reply_markup=ReplyKeyboardRemove())
+        return ConversationHandler.END
 
 async def get_contact(update: Update, context):
     global contact
+    
     if update.message.contact:
         contact = update.message.contact.phone_number
     else:
@@ -209,7 +233,8 @@ async def get_contact(update: Update, context):
             await update.message.reply_text("❌ Iltimos, raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
                                             parse_mode="HTML")
             return CONTACT
-
+    message = await update.message.reply_text("Iltimos, biroz kuting")
+    await context.bot.deleteMessage(chat_id=update.message.chat_id, message_id=message.id)
     user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact}</b>\n<b>📍 Manzil: {user_location}</b>"
 
     await context.bot.send_message(chat_id=ADMIN,
@@ -236,7 +261,7 @@ async def get_contact(update: Update, context):
         }
         order_item_response = requests.post(url="https://zedproject.pythonanywhere.com/api/order-item/",
                                             json=order_item_data)
-
+    
     await update.message.reply_text("Buyurtma qabul qilindi. Tez orada siz bilan bo'glanishadi.",
                                     reply_markup=ReplyKeyboardRemove())
 
@@ -246,11 +271,8 @@ async def get_contact(update: Update, context):
 
 
 def main():
-<<<<<<< HEAD
-    application = Application.builder().token("7022978226:AAEHq0JHlHaTr_AQj6BQGdjAdbxowbg7XWc").build()
-=======
+
     application = Application.builder().token("6537176842:AAF-VOqQcRBpFjLxZ-gydt46hYWW2Ag1wTM").build()
->>>>>>> bbf6d56 (v2.2)
 
     conv_handler = ConversationHandler(
         entry_points=[
@@ -263,6 +285,7 @@ def main():
             LOCATION: [MessageHandler(filters.TEXT | filters.LOCATION, get_location)],
             ORDER: [MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data)],
             CONTACT: [MessageHandler(filters.CONTACT | filters.TEXT, get_contact)],
+            CHECK: [MessageHandler(filters.TEXT, check)],
             PHONE_NUMBER: [MessageHandler(filters.TEXT, phone_number)],
             HISTORY: [MessageHandler(filters.TEXT, history)],
         },
