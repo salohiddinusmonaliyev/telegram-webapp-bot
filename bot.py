@@ -34,7 +34,7 @@ async def start(update: Update, context):
     buttons = [["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
     admin_buttons = [["📄 Buyurtmalar tarixini olish"], ["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
     if user_id == ADMIN:
-        await update.message.reply_text(f"Salom {context.bot.username}", reply_markup=ReplyKeyboardMarkup(admin_buttons, resize_keyboard=True))
+        await update.message.reply_text(f"Salom", reply_markup=ReplyKeyboardMarkup(admin_buttons, resize_keyboard=True))
     else:
         await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
     return START
@@ -295,7 +295,7 @@ async def get_contact(update: Update, context):
 
 def main():
 
-    application = Application.builder().token("7022978226:AAEjbG7oXVf4kdXx2Mq9JU5_Js4Ytwh-tDo").build()
+    application = Application.builder().token("7022978226:AAEoFQRuWwRFcTlNXgmcLUCRUEoHoCBZOUc").build()
 
     conv_handler = ConversationHandler(
         entry_points=[
