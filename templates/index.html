@@ -49,14 +49,14 @@ input:checked {
 				{% if i.image %}
 				<img src="{{ i.image.url }}"
 				     style="border-radius: 8px"
-				     alt="Burger">
+				     alt="">
 				{% endif %}
 			</picture><hr>
 		</div>
 		<label for="input1{{i.id}}">Blok</label>
-			    <input style="color: var(--main-color)" name="type{{i.id}}" id="input1{{i.id}}" type="radio"><br>
+			    <input style="color: var(--main-color)" name="type{{i.id}}" id="blok{{i.id}}" type="radio" checked><br>
 	    <label for="input{{i.id}}">Dona</label>
-			    <input style="color: var(--main-color)" name="type{{i.id}}" id="input{{i.id}}" type="radio"><hr>
+			    <input style="color: var(--main-color)" name="type{{i.id}}" id="dona{{i.id}}" type="radio"><hr>
 		<div class="cafe-item-label">
 			<span class="cafe-item-title">{{ i.name }}</span>
 			<span class="cafe-item-price">{{ i.price }} so'm</span>
@@ -89,23 +89,41 @@ input:checked {
 <script type="text/javascript">
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setText('Buyurtma berish').show().onClick(function () {
-        // Get the item quantity and price from the cafe app
-        const items = document.getElementsByClassName('js-item');
-        const order = [];
+const items = document.getElementsByClassName('js-item');
+const order = [];
 
-        Array.from(items).forEach(function(item) {
-            const id = item.getAttribute('data-item-id');
-            const quantity = parseInt(item.querySelector('.js-item-counter').innerText);
-            const priceElement = item.querySelector('.cafe-item-price');
-            const price = parseFloat(priceElement.innerText.replace('$', ''));
-            const title = item.querySelector('.cafe-item-title').innerText;
+Array.from(items).forEach(function(item) {
+    const id = item.getAttribute('data-item-id');
+    const quantity = parseInt(item.querySelector('.js-item-counter').innerText);
+    const priceElement = item.querySelector('.cafe-item-price');
+    const price = parseFloat(priceElement.innerText.replace(' so\'m', '')); // adjusted for currency
+    const title = item.querySelector('.cafe-item-title').innerText;
 
-            order.push({id: id, quantity: quantity, price: price, title: title});
-        });
+    // Fetch the selected radio button
+    const radioButtons = item.querySelectorAll('input[type="radio"]');
+    let selectedOption = "";
+    radioButtons.forEach(function(radioButton) {
+        if (radioButton.checked) {
+            selectedOption = radioButton.id.replace("input", ""); // Extracting the ID from the radio button ID
+        }
+    });
 
-        const data = JSON.stringify(order);
-        Telegram.WebApp.sendData(data);
-        Telegram.WebApp.close();
+    order.push({
+        id: id,
+        quantity: quantity,
+        price: price,
+        title: title,
+        selectedOption: selectedOption // Include ID of the checked radio button
+    });
+});
+
+const data = JSON.stringify(order);
+// Now 'data' contains all the necessary information including the ID of the checked item.
+// You can send this 'data' to your server or backend using AJAX, Fetch API, or any other method.
+
+Telegram.WebApp.sendData(data);
+Telegram.WebApp.close();
+
     });
 </script>
 <script type="text/javascript">
