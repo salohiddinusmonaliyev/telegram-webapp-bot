@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta
 # from dateutil.relativedelta import relativedelta
 import pandas as pd
 import calendar
+import time
 
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler
@@ -243,8 +244,12 @@ async def get_contact(update: Update, context):
             await update.message.reply_text("❌ Iltimos, raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
                                             parse_mode="HTML")
             return CONTACT
-    message = await update.message.reply_text("Iltimos, biroz kuting")
-    await context.bot.deleteMessage(chat_id=update.message.chat_id, message_id=message.id)
+
+
+
+    message = await update.message.reply_text("Iltimos, biroz kuting ⏳")
+
+
     # print(user_location)
     try:
         location = await context.bot.send_location(chat_id=ADMIN, latitude=user_location.latitude, longitude=user_location.longitude)
@@ -254,11 +259,6 @@ async def get_contact(update: Update, context):
         user_location_msg = user_location
     user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact}</b>\n<b>📍 Manzil: {user_location_msg}</b>"
 
-    await context.bot.send_message(chat_id=ADMIN,
-                                   text=(
-                                       f"<b>Yangi buyurtma 🚚</b>{user_data}\n\n<b>💰 Umumiy narx: {order_total_price} so'm</b>"
-                                   ), parse_mode="HTML"
-                                   )
 
     json_data = {
         "time": f"{date.today()}",
@@ -284,18 +284,28 @@ async def get_contact(update: Update, context):
             }
             order_item_response = requests.post(url="https://zedproject.pythonanywhere.com/api/order-item/",
                                                 json=order_item_data)
-    
+    await context.bot.deleteMessage(chat_id=update.message.chat_id, message_id=message.id)
     await update.message.reply_text("Buyurtma qabul qilindi. Tez orada siz bilan bo'glanishadi.",
                                     reply_markup=ReplyKeyboardRemove())
 
     await update.message.reply_text("Yangi buyurtma berish uchun <b>/start</b> ni bosing", reply_markup=ReplyKeyboardRemove(),
                                     parse_mode="HTML")
+
+
+    await context.bot.send_message(chat_id=ADMIN,
+                                   text=(
+                                       f"<b>🆕 Yangi buyurtma</b>{user_data}\n\n<b>💰 Umumiy narx: {order_total_price} so'm</b>"
+                                   ), parse_mode="HTML"
+                                   )
+
+
+
     return ConversationHandler.END
 
 
 def main():
 
-    application = Application.builder().token("7022978226:AAEoFQRuWwRFcTlNXgmcLUCRUEoHoCBZOUc").build()
+    application = Application.builder().token("7022978226:AAE4rKcFpb2BYgVbcARPFgYkww5FrUyDPtM").build()
 
     conv_handler = ConversationHandler(
         entry_points=[
@@ -315,6 +325,7 @@ def main():
         fallbacks=[],
     )
     application.add_handler(conv_handler)
+    # application.start_polling(port=5555)
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
