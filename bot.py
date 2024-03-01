@@ -20,8 +20,11 @@ def get_location_name(latitude, longitude):
     return location.address
 
 
+TOKEN = "7022978226:AAGaBUjp8JIo6AJSWgxpiIr57apOfV_FtLM"
+
 pattern = r'\+998\d{9}\b'
 
+ADMINS = ["6513420947", "6742107402", "49036206"]
 
 ADMIN = "6513420947"
 # logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
@@ -34,10 +37,14 @@ async def start(update: Update, context):
     user_id = str(update.effective_user.id)
     buttons = [["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
     admin_buttons = [["📄 Buyurtmalar tarixini olish"], ["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
-    if user_id == ADMIN:
+    print(update.effective_user.id, update.effective_user)
+    
+    if str(update.effective_user.id) in ADMINS:
         await update.message.reply_text(f"Salom", reply_markup=ReplyKeyboardMarkup(admin_buttons, resize_keyboard=True))
     else:
         await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
+        
+        
     return START
 
 
@@ -305,7 +312,7 @@ async def get_contact(update: Update, context):
 
 def main():
 
-    application = Application.builder().token("7022978226:AAE4rKcFpb2BYgVbcARPFgYkww5FrUyDPtM").build()
+    application = Application.builder().token(TOKEN).build()
 
     conv_handler = ConversationHandler(
         entry_points=[
