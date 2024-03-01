@@ -1,21 +1,14 @@
 import json
 import logging
-import re
 import requests
 from datetime import date, datetime, timedelta
-# from dateutil.relativedelta import relativedelta
-import pandas as pd
-import calendar
-import time
 
 from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler
-
-
-from geopy.geocoders import Nominatim
-
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, ContextTypes
 
 from environs import Env
+
+from utils import *
 
 env = Env()
 env.read_env()
@@ -25,20 +18,7 @@ ADMINS = env.list("ADMINS")
 ADMIN = env.str("ADMIN")
 
 
-def get_location_name(latitude, longitude):
-    geolocator = Nominatim(user_agent="location_finder")
-    location = geolocator.reverse((latitude, longitude), language='en')
-    return location.address
-
-
-
-pattern = r'\+998\d{9}\b'
-
-
-# logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
-# logger = logging.getLogger(__name__)
-
-START, LOCATION, ORDER, CONTACT, PHONE_NUMBER, HISTORY, CHECK = range(7)
+START, LOCATION, ORDER, CONTACT, PHONE_NUMBER, HISTORY, CONFIRM = range(7)
 
 
 async def start(update: Update, context):
@@ -47,7 +27,7 @@ async def start(update: Update, context):
     admin_buttons = [["📄 Buyurtmalar tarixini olish"], ["🛍 Buyurtma berish", "ℹ️ Biz haqimizda"]]
     print(update.effective_user.id, update.effective_user)
     
-    if str(update.effective_user.id) in ADMINS:
+    if is_admin(user_id):
         await update.message.reply_text(f"Salom", reply_markup=ReplyKeyboardMarkup(admin_buttons, resize_keyboard=True))
     else:
         await update.message.reply_text("Salom", reply_markup=ReplyKeyboardMarkup(buttons, resize_keyboard=True))
@@ -63,7 +43,7 @@ async def contact_us(update: Update, context):
     await update.message.reply_text("Contact\n/start ni bosing")
 
 
-async def begin(update: Update, context):
+async def mainHandler(update: Update, context):
     text = update.message.text
     if text == "🛍 Buyurtma berish":
         await update.message.reply_text("Buyurtma berish uchun birinchi navbatda joylashuvingizni yuboring",
@@ -84,48 +64,42 @@ async def begin(update: Update, context):
         return await menu(update, context)
     elif text == "/contact_us":
         return await contact_us(update, context)
-    else:
-        await update.message.reply_text("🚫🚫🚫")
-        return await start(update, context)
-        return ConversationHandler.END
 
 
-async def phone_number(update: Update, context):
+
+async def get_phone_number(update: Update, context):
     # print(update.message.text)
-    if re.match(pattern, update.message.text):
+    phone_number = update.message.text
+    if validate_phone_number(phone_number):
         user_data = context.user_data
         user_data["phone_number"] = update.message.text
         await update.message.reply_text("Muddatni tanlang:", reply_markup=ReplyKeyboardMarkup(
             [["📆 O'tgan oy", "🗓 O'tgan yil"]], resize_keyboard=True))
         return HISTORY
-    else:
+    elif update.message.text != "/cancel":
         await update.message.reply_html("❌ Iltimos, raqamni <b>+998CCXXXXXXX</b> formatida kiriting.")
         return PHONE_NUMBER
 
 
-async def history(update: Update, context):
-    # print(update.message.text)
+async def get_order_history(update: Update, context):
     if update.message.text == "📆 O'tgan oy" or update.message.text == "🗓 O'tgan yil":   
         message = await update.message.reply_text("Iltimos, biroz kuting")
 
-        phone_number = context.user_data['phone_number']
-        json_data = requests.get("https://zedproject.pythonanywhere.com/api/order/")
-        json_data_order_item = requests.get("https://zedproject.pythonanywhere.com/api/order-item/")
-        items = json_data_order_item.json()
-        orders = json_data.json()
+        order_json_data = requests.get("https://zedproject.pythonanywhere.com/api/order/")
+        order_item_json_data = requests.get("https://zedproject.pythonanywhere.com/api/order-item/")
+        items = order_item_json_data.json()
+        orders = order_json_data.json()
         order_list = []
+        phone_number = context.user_data['phone_number']
         for order in orders:
             item_list = [item for item in items if item["order_id"] == order["id"] and order["user"] == phone_number]
             if item_list:
                 order["items"] = item_list
                 order_list.append(order)
 
-        def parse_date(date_str):
-            return datetime.strptime(date_str, "%Y-%m-%d")
 
         today = datetime.today()
-        # today = today.date()
-        # print(today.date())
+
         if update.message.text == "📆 O'tgan oy":
             first_day_of_current_month = today.replace(day=1)
             last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
@@ -133,6 +107,7 @@ async def history(update: Update, context):
             time1, time2 = first_day_of_previous_month.date(), last_day_of_previous_month.date()
             items = [item for item in order_list if parse_date(item['time']) >= first_day_of_previous_month and
                     parse_date(item['time']) <= last_day_of_previous_month]
+
         elif update.message.text == "🗓 O'tgan yil":
             start_last_year = datetime(today.year - 1, 1, 1)
             end_last_year = start_last_year.replace(year=today.year - 1, month=12, day=31)
@@ -141,26 +116,24 @@ async def history(update: Update, context):
             items = [item for item in order_list if item["time"] >= start_last_year_str and item["time"] <= end_last_year_str]
 
         items_data = []
-        for order in items:
-            order_date = order["time"]
-            for item in order['items']:
+        for order_item in items:
+            order_date = order_item["time"]
+            for item in order_item['items']:
                 product_response = requests.get("https://zedproject.pythonanywhere.com/api/product/")
                 product_json = product_response.json()
                 product = next((p["name"] for p in product_json if p["id"] == item["product"]), None)
 
                 item['Buyurtma raqami'] = item.pop("order_id")
-                del item["id"]
                 item["Mahsulot"] = product
-                del item["product"]
                 item["Narxi"] = item.pop("price")
                 item["Miqdori"] = item.pop("quantity")
                 item["Sana"] = order_date
+                del item["id"]
+                del item["product"]
+
                 items_data.append(item)
 
-        df = pd.DataFrame(items_data)
-        file_name = f"{phone_number} - {update.message.text}"
-        excel_filename = f'history/{file_name}.xlsx'
-        df.to_excel(excel_filename, index=False)
+        file_name = save_data_to_excel(phone_number, items_data, update.message.text)
         await context.bot.deleteMessage(chat_id=update.message.chat_id,
                                     message_id=message.id)
         await update.message.reply_document(document=f"history/{file_name}.xlsx",
@@ -168,30 +141,37 @@ async def history(update: Update, context):
                                             parse_mode="HTML", reply_markup=ReplyKeyboardRemove())
         await update.message.reply_text("Botni qayta ishga tushirish uchun /start ni bosing.")
         return ConversationHandler.END
-    else:
-        await update.message.reply_text("Xatolik")
-        await update.message.reply_text("/start ni bosib botni qayta ishga tushiring")
-        return ConversationHandler.END
+
 
 async def get_location(update: Update, context):
     global user_location
     if update.message.location:
         user_location = update.message.location
-    else:
+        await update.message.reply_text(
+            "Buyurtma berish uchun pastdagi tugmani bosing.",
+            reply_markup=ReplyKeyboardMarkup.from_button(
+                KeyboardButton(
+                    text="🛒 Buyurtmma berish",
+                    web_app=WebAppInfo(url="https://zedproject.pythonanywhere.com/"),
+                ), resize_keyboard=True, input_field_placeholder="Buyurtma bering"
+            ),
+        )
+        return ORDER
+    elif update.message.text != "/cancel":
         user_location = update.message.text
-    await update.message.reply_text(
-        "Buyurtma berish uchun pastdagi tugmani bosing.",
-        reply_markup=ReplyKeyboardMarkup.from_button(
-            KeyboardButton(
-                text="🛒 Buyurtmma berish",
-                web_app=WebAppInfo(url="https://zedproject.pythonanywhere.com/"),
-            ), resize_keyboard=True, input_field_placeholder="Buyurtma bering"
-        ),
-    )
-    return ORDER
+        await update.message.reply_text(
+            "Buyurtma berish uchun pastdagi tugmani bosing.",
+            reply_markup=ReplyKeyboardMarkup.from_button(
+                KeyboardButton(
+                    text="🛒 Buyurtmma berish",
+                    web_app=WebAppInfo(url="https://zedproject.pythonanywhere.com/"),
+                ), resize_keyboard=True, input_field_placeholder="Buyurtma bering"
+            ),
+        )
+        return ORDER
 
 
-async def web_app_data(update: Update, context):
+async def order(update: Update, context):
     global data
     data = json.loads(update.effective_message.web_app_data.data)
     text = ""
@@ -228,7 +208,7 @@ async def web_app_data(update: Update, context):
     order_items = text
     return CHECK
 
-async def check(update: Update, context):
+async def confirm(update: Update, context):
     if update.message.text == "✅ Ha":
         await update.message.reply_html("✅ Buyurtma tasdiqlandi")
         await update.message.reply_text(
@@ -246,34 +226,27 @@ async def check(update: Update, context):
         return ConversationHandler.END
 
 async def get_contact(update: Update, context):
-    global contact
-    
     if update.message.contact:
         contact = update.message.contact.phone_number
     else:
         contact = update.message.text
-        if re.match(pattern, contact):
+        if validate_phone_number(contact):
             await update.message.reply_text("✅ Telefon raqam qabul qilindi", reply_markup=ReplyKeyboardRemove())
-            contact = update.message.text
         else:
             await update.message.reply_text("❌ Iltimos, raqamingizni quyidagi formatda kiriting (<b>+998CCXXXXXXX</b>)",
                                             parse_mode="HTML")
             return CONTACT
 
-
-
     message = await update.message.reply_text("Iltimos, biroz kuting ⏳")
 
-
-    # print(user_location)
     try:
         location = await context.bot.send_location(chat_id=ADMIN, latitude=user_location.latitude, longitude=user_location.longitude)
         g_map = f"https://www.google.com/maps/@{user_location.latitude},{user_location.longitude},315m/data=!3m1!1e3?hl=en-US&entry=ttu"
         user_location_msg = f"<a href='{g_map}'>{get_location_name(latitude=user_location.latitude, longitude=user_location.longitude)}</a>"
     except AttributeError:
         user_location_msg = user_location
-    user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact}</b>\n<b>📍 Manzil: {user_location_msg}</b>"
 
+    user_data = f"{order_items}\n\n<b>☎️ Telefon raqam: {contact}</b>\n<b>📍 Manzil: {user_location_msg}</b>"
 
     json_data = {
         "time": f"{date.today()}",
@@ -314,6 +287,15 @@ async def get_contact(update: Update, context):
                                    )
 
 
+    return ConversationHandler.END
+
+
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Cancels and ends the conversation."""
+    user = update.message.from_user
+    await update.message.reply_text(
+        "Bosh sahifaga qaytildi", reply_markup=ReplyKeyboardRemove()
+    )
 
     return ConversationHandler.END
 
@@ -329,15 +311,15 @@ def main():
             CommandHandler("contact_us", start),  # Replace "contact_us" with appropriate function
         ],
         states={
-            START: [MessageHandler(filters.TEXT, begin)],
+            START: [MessageHandler(filters.TEXT, mainHandler)],
             LOCATION: [MessageHandler(filters.TEXT | filters.LOCATION, get_location)],
-            ORDER: [MessageHandler(filters.StatusUpdate.WEB_APP_DATA, web_app_data)],
+            ORDER: [MessageHandler(filters.StatusUpdate.WEB_APP_DATA, order)],
             CONTACT: [MessageHandler(filters.CONTACT | filters.TEXT, get_contact)],
-            CHECK: [MessageHandler(filters.TEXT, check)],
-            PHONE_NUMBER: [MessageHandler(filters.TEXT, phone_number)],
-            HISTORY: [MessageHandler(filters.TEXT, history)],
+            CONFIRM: [MessageHandler(filters.TEXT, confirm)],
+            PHONE_NUMBER: [MessageHandler(filters.TEXT, get_phone_number)],
+            HISTORY: [MessageHandler(filters.TEXT, get_order_history)],
         },
-        fallbacks=[],
+        fallbacks=[CommandHandler("cancel", cancel)],
     )
     application.add_handler(conv_handler)
     # application.start_polling(port=5555)
