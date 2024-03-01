@@ -14,19 +14,27 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 
 from geopy.geocoders import Nominatim
 
+
+from environs import Env
+
+env = Env()
+env.read_env()
+
+TOKEN = env.str("TOKEN")
+ADMINS = env.list("ADMINS")
+ADMIN = env.str("ADMIN")
+
+
 def get_location_name(latitude, longitude):
     geolocator = Nominatim(user_agent="location_finder")
     location = geolocator.reverse((latitude, longitude), language='en')
     return location.address
 
 
-TOKEN = "7022978226:AAGaBUjp8JIo6AJSWgxpiIr57apOfV_FtLM"
 
 pattern = r'\+998\d{9}\b'
 
-ADMINS = ["6513420947", "6742107402", "49036206"]
 
-ADMIN = "6513420947"
 # logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 # logger = logging.getLogger(__name__)
 
