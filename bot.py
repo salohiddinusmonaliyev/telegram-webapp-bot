@@ -315,10 +315,10 @@ async def order_status(update: Update, context):
         }
         
         order_number = extract_numbers(call_back)
-        old_data = requests.get("https://zedproject.pythonanywhere.com/api/order/1/").json()
+        old_data = requests.get(f"https://zedproject.pythonanywhere.com/api/order/{order_number}/").json()
         old_data["status"] = True
         # print(old_data)
-        order_response = requests.put(url=f"https://zedproject.pythonanywhere.com/api/order/1/", json=old_data)
+        order_response = requests.put(url=f"https://zedproject.pythonanywhere.com/api/order/{order_number}/", json=old_data)
         # print(order_response.status_code)
         # print(order_response.json())
         await context.bot.send_message(chat_id=ADMIN, text=f"{order_number}-buyurtma yetkazib berildi")
