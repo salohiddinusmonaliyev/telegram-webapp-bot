@@ -28,7 +28,7 @@ class Order(models.Model):
     time = models.DateField()
     total_price = models.CharField(max_length=250, null=True, blank=True)
     user = models.CharField(max_length=250, null=True, blank=True)
-
+    status = models.BooleanField(null=True, default=False)
 
     def __str__(self):
         return f"{self.id}"

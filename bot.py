@@ -3,8 +3,8 @@ import logging
 import requests
 from datetime import date, datetime, timedelta
 
-from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, ContextTypes
+from telegram import KeyboardButton, ReplyKeyboardMarkup, Update, WebAppInfo, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, ContextTypes, CallbackQueryHandler
 
 from environs import Env
 
@@ -206,7 +206,7 @@ async def order(update: Update, context):
     global order_total_price
     order_total_price = total_price
     order_items = text
-    return CHECK
+    return CONFIRM
 
 async def confirm(update: Update, context):
     if update.message.text == "✅ Ha":
@@ -256,7 +256,7 @@ async def get_contact(update: Update, context):
     }
 
     order_response = requests.post(url="https://zedproject.pythonanywhere.com/api/order/", json=json_data)
-    
+    order_id = order_response.json()["id"]
     for i in data:
         if i["quantity"] != 0 and i['quantity'] is not None:
             piece_or_block = None
@@ -265,7 +265,7 @@ async def get_contact(update: Update, context):
             elif i["selectedOption"][:4] == "blok":
                 piece_or_block = "blok"
             order_item_data = {
-                "order_id": order_response.json()["id"],
+                "order_id": order_id,
                 "price": i["price"],
                 "quantity": f"{i["quantity"]} {piece_or_block}",
                 "product": i["id"],
@@ -278,14 +278,19 @@ async def get_contact(update: Update, context):
 
     await update.message.reply_text("Yangi buyurtma berish uchun <b>/start</b> ni bosing", reply_markup=ReplyKeyboardRemove(),
                                     parse_mode="HTML")
+    keyboard = [
+        [
+            InlineKeyboardButton("🚚 Yetkazib berildi", callback_data=f"done-{order_id}"),
+        ],
+    ]
 
+    reply_markup = InlineKeyboardMarkup(keyboard)
 
     await context.bot.send_message(chat_id=ADMIN,
                                    text=(
-                                       f"<b>🆕 Yangi buyurtma</b>{user_data}\n\n<b>💰 Umumiy narx: {order_total_price} so'm</b>"
-                                   ), parse_mode="HTML"
+                                       f"<b>🆕 №{order_id} Yangi buyurtma</b>{user_data}\n\n<b>💰 Umumiy narx: {order_total_price} so'm</b>"
+                                   ), parse_mode="HTML", reply_markup=reply_markup
                                    )
-
 
     return ConversationHandler.END
 
@@ -296,9 +301,16 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(
         "Bosh sahifaga qaytildi", reply_markup=ReplyKeyboardRemove()
     )
+    return await start(update, context)
 
     return ConversationHandler.END
 
+
+async def order_status(update: Update, context):
+    call_back = str(update.callback_query.data)
+    if call_back[:5] == "done-":
+        order_number = extract_numbers(call_back)
+        await context.bot.send_message(chat_id=ADMIN, text=f"{order_number}-buyurtma yetkazib berildi")
 
 def main():
 
@@ -309,6 +321,7 @@ def main():
             CommandHandler("start", start),
             CommandHandler("menu", menu),
             CommandHandler("contact_us", start),  # Replace "contact_us" with appropriate function
+            CallbackQueryHandler(order_status)
         ],
         states={
             START: [MessageHandler(filters.TEXT, mainHandler)],

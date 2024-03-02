@@ -38,3 +38,11 @@ def is_admin(user_id):
 		return True
 	else:
 		return False
+
+def extract_numbers(data):
+    pattern = re.compile(r'done-(\d+)')
+    match = pattern.search(data)
+    if match:
+        number = int(match.group(1))
+        print(number)
+        return number
