@@ -5,6 +5,10 @@ from datetime import datetime
 
 from environs import Env
 
+import json
+import requests
+import xlsxwriter
+
 env = Env()
 env.read_env()
 
@@ -18,10 +22,31 @@ def validate_phone_number(phone_number):
 		return False
 
 def save_data_to_excel(phone_number, items_data, text):
-    df = pd.DataFrame(items_data)
     file_name = phone_number
     excel_filename = f'history/{file_name}.xlsx'
-    df.to_excel(excel_filename, index=False)
+
+    # Create a new Excel workbook
+    workbook = xlsxwriter.Workbook(excel_filename)
+    worksheet = workbook.add_worksheet()
+
+    # Write column headers
+    headers = ['Buyurtma raqami', 'Mahsulot', 'Narxi', 'Miqdori', 'Sana']
+    for col_num, header in enumerate(headers):
+        worksheet.write(0, col_num, header)
+
+    # Write data to Excel
+    row = 1
+    for item in items_data:
+        worksheet.write(row, 0, item.get('Buyurtma raqami', ''))
+        worksheet.write(row, 1, item.get('Mahsulot', ''))
+        worksheet.write(row, 2, item.get('Narxi', ''))
+        worksheet.write(row, 3, item.get('Miqdori', ''))
+        worksheet.write(row, 4, item.get('Sana', ''))
+        row += 1
+
+    # Close the workbook
+    workbook.close()
+
     return file_name
 
 

@@ -267,7 +267,7 @@ async def get_contact(update: Update, context):
             order_item_data = {
                 "order_id": order_id,
                 "price": i["price"],
-                "quantity": f"{i["quantity"]} {piece_or_block}",
+                "quantity": f"{i['quantity']} {piece_or_block}",
                 "product": i["id"],
             }
             order_item_response = requests.post(url="https://zedproject.pythonanywhere.com/api/order-item/",
@@ -309,7 +309,18 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def order_status(update: Update, context):
     call_back = str(update.callback_query.data)
     if call_back[:5] == "done-":
+        json_data = {
+
+            "status": True
+        }
+        
         order_number = extract_numbers(call_back)
+        old_data = requests.get("https://zedproject.pythonanywhere.com/api/order/1/").json()
+        old_data["status"] = True
+        # print(old_data)
+        order_response = requests.put(url=f"https://zedproject.pythonanywhere.com/api/order/1/", json=old_data)
+        # print(order_response.status_code)
+        # print(order_response.json())
         await context.bot.send_message(chat_id=ADMIN, text=f"{order_number}-buyurtma yetkazib berildi")
 
 def main():
