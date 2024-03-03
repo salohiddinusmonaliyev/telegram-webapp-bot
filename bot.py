@@ -276,8 +276,8 @@ async def get_contact(update: Update, context):
     await update.message.reply_text("Buyurtma qabul qilindi. Tez orada siz bilan bo'glanishadi.",
                                     reply_markup=ReplyKeyboardRemove())
 
-    await update.message.reply_text("Yangi buyurtma berish uchun <b>/start</b> ni bosing", reply_markup=ReplyKeyboardRemove(),
-                                    parse_mode="HTML")
+    # await update.message.reply_text("Yangi buyurtma berish uchun <b>/start</b> ni bosing", reply_markup=ReplyKeyboardRemove(),
+    #                                 parse_mode="HTML")
     keyboard = [
         [
             InlineKeyboardButton("🚚 Yetkazib berildi", callback_data=f"done-{order_id}"),
@@ -292,7 +292,7 @@ async def get_contact(update: Update, context):
                                    ), parse_mode="HTML", reply_markup=reply_markup
                                    )
 
-    return ConversationHandler.END
+    return await start(update, context)
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
