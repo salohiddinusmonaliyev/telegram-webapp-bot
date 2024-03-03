@@ -1,5 +1,5 @@
 
-# 💣 Bomba Burger Bot
+# Telegram WebApp bot
 
 This Telegram bot enables users to quickly and easily order fast food. Users can select items from the menu.
 
@@ -17,7 +17,7 @@ This Telegram bot enables users to quickly and easily order fast food. Users can
 
 
 ```bash
-  git clone https://github.com/salohiddinusmonaliyev/bombaburger-bot.git
+  git clone https://github.com/salohiddinusmonaliyev/telegram-webapp-bot.git
   pip install -r requirements.txt
   python bot.py
 ```
