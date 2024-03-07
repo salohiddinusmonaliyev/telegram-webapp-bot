@@ -2,7 +2,6 @@ Django~=5.0.2
 djangorestframework~=3.14.0
 python-telegram-bot
 requests
-pandas
-openpyxl
+xlsxwriter
 geopy
 environs
